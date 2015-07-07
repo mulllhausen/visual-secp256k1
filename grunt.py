@@ -6,11 +6,10 @@ this file is just for understanding concepts. it should not be used for
 performing live crypto operations.
 """
 
-global markdown
 secp256k1_eq = "y^2 = x^3 + 7"
 
 from distutils.version import LooseVersion
-import sympy, mpmath, numpy, matplotlib
+import sympy, mpmath, numpy, matplotlib, hashlib
 import matplotlib.pyplot as plt
 
 if LooseVersion(mpmath.__version__) < LooseVersion("0.19"):
@@ -36,6 +35,15 @@ if LooseVersion(matplotlib.__version__) < LooseVersion("1.1.1"):
 		"matplotlib 1.1.1 or later is required. install it with `sudo apt-get"
 		" install matplotlib`"
 	)
+
+def init_grunt_globals(markdown_local, md_file_local):
+	"""
+	initialize the globals for this module:
+	markdown_local - True/False
+	md_file_local - the name of the markdown file (beware - gets overwritten)
+	"""
+	global markdown, md_file
+	(markdown, md_file) = (markdown_local, md_file_local)
 
 ################################################################################
 # begin curve and line equations
@@ -344,7 +352,7 @@ def finalize_plot_ec(img_filename = None):
 	either display the graph as a new window or save the graph as an image and
 	write a link to the image in the img dir
 	"""
-	global plt, markdown
+	##########global plt, markdown
 	try:
 		save = markdown
 	except:
@@ -360,3 +368,52 @@ def finalize_plot_ec(img_filename = None):
 ################################################################################
 # end functions for plotting graphs
 ################################################################################
+
+############################################################################
+# begin functions for saving/displaying math equations and text
+############################################################################
+def quick_write(output):
+	print "%s\n" % output
+	if not markdown:
+		return
+	with open(md_file, "a") as f:
+		f.write("%s\n\n" % output)
+
+def quick_equation(eq = None, latex = None):
+	"""
+	first print the given equation. optionally, in markdown mode, generate an
+	image from an equation and write a link to it.
+	"""
+	if eq is not None:
+		sympy.pprint(eq)
+	else:
+		print latex
+	# print an empty line
+	print
+	if not markdown:
+		return
+
+	global plt
+	if latex is None:
+		latex = sympy.latex(eq)
+	img_filename = hashlib.sha1(latex).hexdigest()[: 10]
+
+	# create the figure and hide the border. set the height and width to
+	# something far smaller than the resulting image - bbox_inches will
+	# expand this later
+	fig = plt.figure(figsize = (0.1, 0.1), frameon = False)
+	ax = fig.add_axes([0, 0, 1, 1])
+	ax.axis("off")
+	fig = plt.gca()
+	fig.axes.get_xaxis().set_visible(False)
+	fig.axes.get_yaxis().set_visible(False)
+	plt.text(0, 0, r"$%s$" % latex, fontsize = 25)
+	plt.savefig("img/%s.png" % img_filename, bbox_inches = "tight")
+	# don't use the entire latex string for the alt text as it could be long
+	quick_write("![%s](img/%s.png)" % (latex[: 20], img_filename))
+
+############################################################################
+# end functions for saving/displaying math equations
+############################################################################
+
+

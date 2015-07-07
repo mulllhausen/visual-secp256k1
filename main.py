@@ -14,7 +14,7 @@ markdown = True if "-m" in sys.argv else False
 init_grunt_globals(markdown, md_file)
 
 if markdown:
-	import os, errno, hashlib
+	import os, errno
 	# create the img directory to store the graph and equation images in
 	try:
 		os.makedirs("img")
@@ -30,7 +30,7 @@ if markdown:
 		if exception.errno != errno.ENOENT:
 			raise
 
-decimal_places = 30
+##########decimal_places = 30
 hr = """
 --------------------------------------------------------------------------------
 """
@@ -38,58 +38,10 @@ hr = """
 # detect the best form of pretty printing available in this terminal
 sympy.init_printing()
 
-############################################################################
-# begin functions for saving/displaying math equations
-############################################################################
-def quick_write(output):
-	global markdown
-	print "%s\n" % output
-	if not markdown:
-		return
-	with open(md_file, "a") as f:
-		f.write("%s\n\n" % output)
-
-def quick_equation(eq = None, latex = None):
-	"""
-	first print the given equation. optionally, in markdown mode, generate an
-	image from an equation and write a link to it.
-	"""
-	global markdown
-	if eq is not None:
-		sympy.pprint(eq)
-	else:
-		print latex
-	# print an empty line
-	print
-	if not markdown:
-		return
-
-	global plt
-	if latex is None:
-		latex = sympy.latex(eq)
-	img_filename = hashlib.sha1(latex).hexdigest()[: 10]
-
-	# create the figure and hide the border. set the height and width to
-	# something far smaller than the resulting image - bbox_inches will
-	# expand this later
-	fig = plt.figure(figsize = (0.1, 0.1), frameon = False)
-	ax = fig.add_axes([0, 0, 1, 1])
-	ax.axis("off")
-	fig = plt.gca()
-	fig.axes.get_xaxis().set_visible(False)
-	fig.axes.get_yaxis().set_visible(False)
-	plt.text(0, 0, r"$%s$" % latex, fontsize = 25)
-	plt.savefig("img/%s.png" % img_filename, bbox_inches = "tight")
-	# don't use the entire latex string for the alt text as it could be long
-	quick_write("![%s](img/%s.png)" % (latex[: 20], img_filename))
-
-############################################################################
-# end functions for saving/displaying math equations
-############################################################################
-
 # document title
 print hr
-quick_write("""# visual secp256k1
+quick_write(
+"""# visual secp256k1
 
 visualise operations on the secp256k1 (bitcoin) elliptic curve
 
@@ -112,11 +64,13 @@ zooming) in your shell.
 6. [signing a message](#6-signing-a-message)
 7. [verifying a message signature](#7-verifying-a-message-signature)
 8. [recovering a public key from a signature](#8-recovering-a-public-key-from-a-signature)
-9. [cracking a private key](#9-cracking-a-private-key)
-""")
+9. [cracking a private key](#9-cracking-a-private-key)"""
+)
 
 if markdown:
-	print "writing output to %s. graphs and equations stored in img/\n" % md_file
+	# a notice when running in markdown mode. not printed to markdown file
+	print "writing output to %s. graphs and equations stored in img/\n" \
+	% md_file
 
 quick_write("the equation of the bitcoin elliptic curve is as follows:")
 quick_equation(latex = secp256k1_eq)
@@ -125,12 +79,11 @@ init_plot_ec(x_max = 7)
 finalize_plot_ec("secp256k1")
 
 quick_write(
-	"### 1. point addition (infinite field)\n\n"
+"""### 1. point addition (infinite field)
 
-	"to add two points on the elliptic curve, just draw a line through them"
-	" and find the third intersection with the curve, then mirror this"
-	" third point about the `x`-axis. for example, adding point `p` to"
-	" point `q`:"
+to add two points on the elliptic curve, just draw a line through them and find
+the third intersection with the curve, then mirror this third point about the
+`x`-axis. for example, adding point `p` to point `q`:"""
 )
 init_plot_ec(x_max = 7)
 
@@ -148,9 +101,10 @@ plot_add(p, q, "p", "q", "p + q", color = "r")
 finalize_plot_ec("point_addition1")
 
 quick_write(
-	"note that the third intersection with the curve can also lie between"
-	" the points being added:"
+"""note that the third intersection with the curve can also lie between the
+points being added:"""
 )
+
 init_plot_ec(x_max = 7)
 
 xp = 6
@@ -196,11 +150,10 @@ plot_add(p, q3, "", "", "", color = "g")
 finalize_plot_ec("point_addition3")
 
 quick_write(
-	"clearly as `q` approaches `p`, the line between `q` and `p` approaches"
-	" the tangent at `p`. and at `q = p` this line *is* the tangent. so a"
-	" point can be added to itself (`p + p`, ie `2p`) by finding the"
-	" tangent to the curve at that point and the third intersection with"
-	" the curve:"
+"""clearly as `q` approaches `p`, the line between `q` and `p` approaches the
+tangent at `p`. and at `q = p` this line *is* the tangent. so a point can be
+added to itself (`p + p`, ie `2p`) by finding the tangent to the curve at that
+point and the third intersection with the curve:"""
 )
 init_plot_ec(x_max = 5)
 
@@ -217,13 +170,12 @@ finalize_plot_ec("point_doubling1")
 xp = 10
 yp_pos = True
 quick_write(
-	"ok, but so what? when you say 'add points on the curve' is this just"
-	" fancy mathematical lingo, or does this form of addition work like"
-	" regular addition? for example does `p + p + p + p = 2p + 2p` on the"
-	" curve?\n\n"
-	"to answer that, lets check with `p` at `x = %s` in the %s half of the"
-	" curve:"
-	% (xp, "top" if yp_pos else "bottom")
+"""ok, but so what? when you say 'add points on the curve' is this just fancy
+mathematical lingo, or does this form of addition work like regular addition?
+for example does `p + p + p + p = 2p + 2p` on the curve?
+
+to answer that, lets check with `p` at `x = %s` in the %s half of the curve:"""
+% (xp, "top" if yp_pos else "bottom")
 )
 def plot_4p(xp, yp_pos, labels_on = True):
 	global plt
@@ -241,21 +193,17 @@ def plot_4p(xp, yp_pos, labels_on = True):
 	init_plot_ec(rightmost_x + 2, color = "y")
 	plot_add(p, p, "p", "p", "2p", color = "r", labels_on = labels_on)
 	plot_add(p, two_p, "p", "2p", "3p", color = "c", labels_on = labels_on)
-	plot_add(
-		p, three_p, "p", "3p", "4p", color = "g", labels_on = labels_on
-	)
-	plot_add(
-		two_p, two_p, "2p", "2p", "4p", color = "b", labels_on = labels_on
-	)
+	plot_add(p, three_p, "p", "3p", "4p", color = "g", labels_on = labels_on)
+	plot_add(two_p, two_p, "2p", "2p", "4p", color = "b", labels_on = labels_on)
 
 plot_4p(xp, yp_pos)
 finalize_plot_ec("4p1")
 
 quick_write(
-	"notice how the tangent to `2p` and the line through `p` and `3p` both"
-	" result in the same intersection with the curve. lets zoom in to"
-	" check:"
+"""notice how the tangent to `2p` and the line through `p` and `3p` both result
+in the same intersection with the curve. lets zoom in to check:"""
 )
+
 plot_4p(xp, yp_pos, labels_on = False)
 plt.axis([-2, 0, -3, 3]) # xmin, xmax, ymin, ymax
 finalize_plot_ec("4p1_zoom")
@@ -263,10 +211,11 @@ finalize_plot_ec("4p1_zoom")
 xp = 4
 yp_pos = False
 quick_write(
-	"ok they sure seem to converge on the same point, but maybe `x = 10` is"
-	" just a special case? does point addition work for other values of"
-	" `x`?\n\nlets try `x = %s` in the %s half of the curve:"
-	% (xp, "top" if yp_pos else "bottom")
+"""ok they sure seem to converge on the same point, but maybe `x = 10` is just a
+special case? does point addition work for other values of `x`?
+
+lets try `x = %s` in the %s half of the curve:"""
+% (xp, "top" if yp_pos else "bottom")
 )
 plot_4p(xp, yp_pos)
 finalize_plot_ec("4p2")
@@ -278,27 +227,28 @@ finalize_plot_ec("4p2_zoom")
 
 xp = 3
 yp_pos = True
-quick_write(
-	"cool. lets do one last check using point `x = %s` in the %s half of"
-	" the curve:"
-	% (xp, "top" if yp_pos else "bottom")
+quick_write("""cool. lets do one last check using point `x = %s` in the %s half
+of the curve:"""
+% (xp, "top" if yp_pos else "bottom")
 )
 plot_4p(xp, yp_pos)
 finalize_plot_ec("4p3")
 
 xp = 10
 yp_pos = True
+
 quick_write(
-	"well, this point addition on the bitcoin elliptic curve certainly"
-	" works in the graphs. but what if the graphs are innaccurate?"
-	" maybe the point addition is only approximate and the graphs do not"
-	" display the inaccuracy...\n\na more accurate way of testing whether"
-	" point addition really does work would be to compute the `x` and `y`"
-	" coordinates at point `p + p + p + p` and also compute the `x` and `y`"
-	" coordinates at point `2p + 2p` and see if they are identical. lets"
-	" check for `x = %s` with y in the %s half of the curve:"
-	% (xp, "top" if yp_pos else "bottom")
+"""well, this point addition on the bitcoin elliptic curve certainly
+works in the graphs. but what if the graphs are innaccurate? maybe the point
+addition is only approximate and the graphs do not display the inaccuracy...
+
+a more accurate way of testing whether point addition really does work would be
+to compute the `x` and `y` coordinates at point `p + p + p + p` and also compute
+the `x` and `y` coordinates at point `2p + 2p` and see if they are identical.
+lets check for `x = %s` with y in the %s half of the curve:"""
+% (xp, "top" if yp_pos else "bottom")
 )
+
 # p + p + p + p
 yp = y_ec(xp, yp_pos)
 p = (xp, yp)
@@ -313,10 +263,10 @@ quick_write("`2p + 2p = %s`" % (two_p_plus_2p, ))
 
 yp_pos = False
 quick_write(
-	"cool! clearly they are identical :) however lets check the more"
-	" general case where `x` at point `p` is a variable in the %s half of"
-	" the curve:"
-	% ("top" if yp_pos else "bottom")
+"""cool! clearly they are identical :) however lets check the more
+general case where `x` at point `p` is a variable in the %s half of the
+curve:"""
+% ("top" if yp_pos else "bottom")
 )
 xp = sympy.symbols("x_p")
 
@@ -350,22 +300,21 @@ quick_equation(
 	latex = "y_{(2p+2p)} = %s" % sympy.latex(y2p_plus_2p.simplify())
 )
 quick_write(
-	"compare these results and you will see that that they are identical."
-	" this means that addition and multiplication of points on the bitcoin"
-	" elliptic curve really does work the same way as regular addition and"
-	" multiplication!"
-)
-print hr
-quick_write(
-	"### 2. subtraction and halving (infinite field)\n\n"
-	"just as points can be added together and doubled and on the bitcoin"
-	" elliptic, so they can also be subtracted and halved. subtraction is"
-	" simply the reverse of addition - ie if we add point `q` to point `p`"
-	" and arrive at point `r` then logically if we subtract point `q` from"
-	" point `r` we should arrive back at `p`: `p + q = r`, therefore"
-	" (subtracting `q` from both sides): `p = r - q`. another way of"
-	" writing this is `r + (-q) = p`. but what is `-q`? it is simply the"
-	" mirroring of point `q` about the `x`-axis:"
+"""compare these results and you will see that that they are
+identical. this means that addition and multiplication of points on the bitcoin
+elliptic curve really does work the same way as regular addition and
+multiplication!
+%s
+### 2. subtraction and halving (infinite field)
+
+just as points can be added together and doubled and on the bitcoin elliptic, so
+they can also be subtracted and halved. subtraction is simply the reverse of
+addition - ie if we add point `q` to point `p` and arrive at point `r` then
+logically if we subtract point `q` from point `r` we should arrive back at `p`:
+`p + q = r`, therefore (subtracting `q` from both sides): `p = r - q`. another
+way of writing this is `r + (-q) = p`. but what is `-q`? it is simply the
+mirroring of point `q` about the `x`-axis:"""
+% hr
 )
 init_plot_ec(x_max = 7)
 
@@ -386,18 +335,16 @@ plot_subtract(r, q, "", "-q", "", color = "g")
 finalize_plot_ec("point_subtraction1")
 
 quick_write(
-	"clearly, subtracting point `q` from point `r` does indeed result in"
-	" point `p` - back where we started."
-)
-quick_write(
-	"so if subtraction is possible on the bitcoin elliptic curve, then how"
-	" about division? well we have already seen how a point can be added to"
-	" itself - ie a doubling (`p + p = 2p`), so the converse must also hold"
-	" true. to get from point `2p` back to point `p` constitutes a halving"
-	" operation. but is it possible? while it is certainly possible to find"
-	" the tangent to the curve which passes through a given point, it must"
-	" be noted that there exist 2 such tangents - one in the top half of"
-	" the curve and one in the bottom:"
+"""clearly, subtracting point `q` from point `r` does indeed result in point `p`
+- back where we started.
+
+so if subtraction is possible on the bitcoin elliptic curve, then how about
+division? well we have already seen how a point can be added to itself - ie a
+doubling (`p + p = 2p`), so the converse must also hold true. to get from point
+`2p` back to point `p` constitutes a halving operation. but is it possible?
+while it is certainly possible to find the tangent to the curve which passes
+through a given point, it must be noted that there exist 2 such tangents - one
+in the top half of the curve and one in the bottom:"""
 )
 # works best if you pick a value between cuberoot(-7) and -0.5
 x2p = -1.7
@@ -422,23 +369,20 @@ plot_add(half_p2, half_p2, "p_2", "", "", color = "b")
 finalize_plot_ec("point_halving1")
 
 quick_write(
-	"this means that it is not possible to conduct a point division and"
-	" arrive at a single solution on the bitcoin elliptic curve. note that"
-	" this conclusion does not apply to elliptic curves over a finite"
-	" field, as we will see later on."
+"""this means that it is not possible to conduct a point division
+and arrive at a single solution on the bitcoin elliptic curve. note that this
+conclusion does not apply to elliptic curves over a finite field, as we will see
+later on.
+%s
+### 3. point addition (finite field)
+### 4. subtraction and halving (finite field)
+### 5. bitcoin master public keys
+### 6. signing a message
+### 7. verifying a message signature
+### 8. recovering a public key from a signature
+### 9. cracking a private key"""
+% hr
 )
-quick_write(hr)
-
-quick_write(
-	"### 3. point addition (finite field)\n\n"
-	"### 4. subtraction and halving (finite field)\n\n"
-	"### 5. bitcoin master public keys\n\n"
-	"### 6. signing a message\n\n"
-	"### 7. verifying a message signature\n\n"
-	"### 8. recovering a public key from a signature\n\n"
-	"### 9. cracking a private key\n\n"
-)
-
 # don't set k too high or it will produce huge numbers that cannot be
 # computed and plotted. k = 7 seems to be about the limit for this simple
 # script
