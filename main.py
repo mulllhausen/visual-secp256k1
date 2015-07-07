@@ -58,15 +58,14 @@ zooming) in your shell.
 
 1. [point addition (infinite field)](#1-point-addition-infinite-field)
 2. [subtraction and halving (infinite field)](#2-subtraction-and-halving-infinite-field)
-3. [point addition (finite field)](#3-point-addition-finite-field)
-4. [subtraction and halving (finite field)](#4-subtraction-and-halving-finite-field)
-5. [bitcoin deterministic keys](#5-bitcoin-deterministic-keys)
-6. [signing a message](#6-signing-a-message)
-7. [verifying a message signature](#7-verifying-a-message-signature)
-8. [recovering a public key from a signature](#8-recovering-a-public-key-from-a-signature)
-9. [cracking a private key](#9-cracking-a-private-key)"""
+3. [point addition (finite field)](#3-point-addition-finite-field) (TODO)
+4. [subtraction and halving (finite field)](#4-subtraction-and-halving-finite-field) (TODO)
+5. [bitcoin deterministic keys](#5-bitcoin-deterministic-keys) (TODO)
+6. [signing a message](#6-signing-a-message) (TODO)
+7. [verifying a message signature](#7-verifying-a-message-signature) (TODO)
+8. [recovering a public key from a signature](#8-recovering-a-public-key-from-a-signature) (TODO)
+9. [cracking a private key](#9-cracking-a-private-key) (TODO)"""
 )
-
 if markdown:
 	# a notice when running in markdown mode. not printed to markdown file
 	print "writing output to %s. graphs and equations stored in img/\n" \
@@ -255,11 +254,11 @@ p = (xp, yp)
 two_p = add_points(p, p)
 three_p = add_points(p, two_p)
 four_p = add_points(p, three_p)
-quick_write("`p + p + p + p = %s`" % (four_p, ))
+quick_write("    p + p + p + p = %s" % (four_p, ))
 
 # 2p + 2p
 two_p_plus_2p = add_points(two_p, two_p)
-quick_write("`2p + 2p = %s`" % (two_p_plus_2p, ))
+quick_write("    2p + 2p = %s" % (two_p_plus_2p, ))
 
 yp_pos = False
 quick_write(
@@ -335,8 +334,8 @@ plot_subtract(r, q, "", "-q", "", color = "g")
 finalize_plot_ec("point_subtraction1")
 
 quick_write(
-"""clearly, subtracting point `q` from point `r` does indeed result in point `p`
-- back where we started.
+"""clearly, subtracting point `q` from point `r` does indeed result in point
+`p` - back where we started.
 
 so if subtraction is possible on the bitcoin elliptic curve, then how about
 division? well we have already seen how a point can be added to itself - ie a

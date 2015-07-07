@@ -15,13 +15,13 @@ zooming) in your shell.
 
 1. [point addition (infinite field)](#1-point-addition-infinite-field)
 2. [subtraction and halving (infinite field)](#2-subtraction-and-halving-infinite-field)
-3. [point addition (finite field)](#3-point-addition-finite-field)
-4. [subtraction and halving (finite field)](#4-subtraction-and-halving-finite-field)
-5. [bitcoin deterministic keys](#5-bitcoin-deterministic-keys)
-6. [signing a message](#6-signing-a-message)
-7. [verifying a message signature](#7-verifying-a-message-signature)
-8. [recovering a public key from a signature](#8-recovering-a-public-key-from-a-signature)
-9. [cracking a private key](#9-cracking-a-private-key)
+3. [point addition (finite field)](#3-point-addition-finite-field) (TODO)
+4. [subtraction and halving (finite field)](#4-subtraction-and-halving-finite-field) (TODO)
+5. [bitcoin deterministic keys](#5-bitcoin-deterministic-keys) (TODO)
+6. [signing a message](#6-signing-a-message) (TODO)
+7. [verifying a message signature](#7-verifying-a-message-signature) (TODO)
+8. [recovering a public key from a signature](#8-recovering-a-public-key-from-a-signature) (TODO)
+9. [cracking a private key](#9-cracking-a-private-key) (TODO)
 
 the equation of the bitcoin elliptic curve is as follows:
 
@@ -93,9 +93,9 @@ to compute the `x` and `y` coordinates at point `p + p + p + p` and also compute
 the `x` and `y` coordinates at point `2p + 2p` and see if they are identical.
 lets check for `x = 10` with y in the top half of the curve:
 
-`p + p + p + p = (-25983597172720/20434333412807, 205390966891466617199*sqrt(1007)/2931267467590684346699)`
+    p + p + p + p = (-25983597172720/20434333412807, 205390966891466617199*sqrt(1007)/2931267467590684346699)
 
-`2p + 2p = (-25983597172720/20434333412807, 205390966891466617199*sqrt(1007)/2931267467590684346699)`
+    2p + 2p = (-25983597172720/20434333412807, 205390966891466617199*sqrt(1007)/2931267467590684346699)
 
 cool! clearly they are identical :) however lets check the more
 general case where `x` at point `p` is a variable in the bottom half of the
@@ -136,8 +136,8 @@ mirroring of point `q` about the `x`-axis:
 
 ![point_subtraction1](img/point_subtraction1.png)
 
-clearly, subtracting point `q` from point `r` does indeed result in point `p`
-- back where we started.
+clearly, subtracting point `q` from point `r` does indeed result in point
+`p` - back where we started.
 
 so if subtraction is possible on the bitcoin elliptic curve, then how about
 division? well we have already seen how a point can be added to itself - ie a
